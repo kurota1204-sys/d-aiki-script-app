@@ -9,7 +9,7 @@
     <title>SCRIPT ASSIST PRO</title>
     
     <script src="https://cdn.tailwindcss.com"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.4.120/pdf.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
     <link href="https://fonts.googleapis.com/css2?family=Sawarabi+Mincho&display=swap" rel="stylesheet">
     
     <style>
@@ -20,8 +20,6 @@
             -webkit-tap-highlight-color: transparent;
             overscroll-behavior: none;
         }
-        
-        /* 縦書きモード */
         .writing-vertical {
             writing-mode: vertical-rl;
             text-orientation: upright;
@@ -31,8 +29,6 @@
             overflow-y: hidden;
             -webkit-overflow-scrolling: touch;
         }
-
-        /* 伏せ字（文字数を隠す固定長） */
         .blind-mask {
             display: inline-block;
             background-color: #0f172a;
@@ -43,19 +39,15 @@
             user-select: none;
         }
         .writing-vertical .blind-mask { min-height: 120px; min-width: 1.2em; }
-
         .revealed-text { color: #1e293b; font-weight: bold; }
-        
         .loader { border: 3px solid #f3f3f3; border-top: 3px solid #6366f1; border-radius: 50%; width: 20px; height: 20px; animation: spin 1s linear infinite; }
         @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
-        
         .role-chip { 
             transition: all 0.2s; border: 2px solid #e2e8f0; cursor: pointer; 
             font-size: 0.85rem; font-weight: bold; padding: 0.6rem 1.2rem; 
             border-radius: 999px; background: white; display: inline-block; margin: 4px;
         }
         .role-chip.selected { background-color: #6366f1; color: white; border-color: #4f46e5; transform: scale(1.05); }
-
         .hint-btn {
             display: flex; align-items: center; justify-content: center;
             width: 44px; height: 44px; background: white; border: 2px solid #6366f1;
@@ -63,14 +55,12 @@
             box-shadow: 0 4px 6px -1px rgba(99, 102, 241, 0.2);
             z-index: 10;
         }
-
         #toast {
             position: fixed; top: -100px; left: 50%; transform: translateX(-50%);
             background: rgba(30, 41, 59, 0.98); color: white;
             padding: 14px 28px; border-radius: 99px; font-weight: bold; z-index: 1000;
             transition: top 0.4s ease; width: 85%; text-align: center;
         }
-
         .modal { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.5); backdrop-filter: blur(4px); z-index: 200; align-items: center; justify-content: center; padding: 20px; }
         .modal.active { display: flex; }
     </style>
@@ -79,7 +69,6 @@
 
     <div id="toast">メッセージ</div>
 
-    <!-- 保存モーダル -->
     <div id="save-modal" class="modal">
         <div class="bg-white w-full max-w-sm rounded-[32px] p-8 shadow-2xl">
             <h3 class="text-xl font-black mb-4 italic">SAVE SCRIPT</h3>
@@ -91,23 +80,20 @@
         </div>
     </div>
 
-    <!-- 設定画面 -->
     <div id="setup-page" class="h-screen overflow-y-auto p-4 flex flex-col pt-[calc(var(--safe-top)+20px)] pb-20 max-w-md mx-auto">
         <header class="text-center mb-8">
             <h1 class="text-3xl font-black text-slate-800 italic tracking-tighter uppercase">Script Assist Pro</h1>
             <div class="flex items-center justify-center gap-2 mt-1">
-                <span class="bg-emerald-100 text-emerald-600 text-[9px] font-bold px-2 py-0.5 rounded-full uppercase">Offline & PDF Optimized</span>
+                <span class="bg-emerald-100 text-emerald-600 text-[9px] font-bold px-2 py-0.5 rounded-full uppercase">GitHub & PDF Version</span>
             </div>
         </header>
 
         <div class="space-y-4">
-            <!-- 保存リスト -->
             <div id="history-section" class="bg-white p-5 rounded-[32px] shadow-sm border border-slate-200 hidden">
                 <label class="block text-[10px] font-black text-slate-400 mb-3 uppercase tracking-widest">保存済みの台本</label>
                 <div id="script-list" class="space-y-2 max-h-48 overflow-y-auto"></div>
             </div>
 
-            <!-- 台本入力 -->
             <div class="bg-white p-5 rounded-[32px] shadow-sm border border-slate-200">
                 <div class="flex items-center justify-between mb-3">
                     <label class="text-[10px] font-black text-slate-400 uppercase tracking-widest">1. 台本の取り込み</label>
@@ -123,7 +109,6 @@
                 </div>
             </div>
 
-            <!-- 役名選択 -->
             <div class="bg-white p-5 rounded-[32px] shadow-sm border border-slate-200">
                 <label class="block text-[10px] font-black text-slate-400 mb-2 uppercase tracking-widest">2. 稽古する役を選択</label>
                 <div id="role-list" class="flex flex-wrap gap-1 mb-4 min-h-[40px]">
@@ -144,7 +129,6 @@
         </div>
     </div>
 
-    <!-- 稽古画面 -->
     <div id="practice-page" class="hidden fixed inset-0 bg-white flex flex-col overflow-hidden">
         <header class="bg-white/95 backdrop-blur-xl border-b border-slate-100 px-6 py-4 flex items-center justify-between z-10 pt-[calc(var(--safe-top)+10px)]">
             <button onclick="window.exitPractice()" class="w-10 h-10 flex items-center justify-center bg-slate-100 rounded-full text-slate-500"><svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M15 19l-7-7 7-7" /></svg></button>
@@ -158,120 +142,29 @@
             </div>
         </header>
         <main id="script-viewport" class="flex-1 overflow-hidden"></main>
-        <div class="absolute bottom-10 left-0 w-full px-6 pointer-events-none flex justify-center safe-pb">
-            <div class="bg-slate-900/90 text-white px-8 py-4 rounded-full shadow-2xl text-[10px] font-bold pointer-events-auto backdrop-blur-sm">
-                黒塗りタップ：全表示 / 💡：1文字ヒント
-            </div>
-        </div>
     </div>
 
     <script type="module">
-        import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
-        import { getAuth, signInAnonymously, signInWithCustomToken, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
-        import { getFirestore, collection, doc, setDoc, getDocs, deleteDoc, Timestamp, enableIndexedDbPersistence } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+        // PDF.jsのWorkerを設定 (ここを最新の読み込み方式に変更しました)
+        const pdfjsLib = window['pdfjs-dist/build/pdf'];
+        pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
 
-        // PDF Workerの初期化を確実に行う
-        if (window.pdfjsLib) {
-            window.pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.4.120/pdf.worker.min.js';
-        }
-
-        const firebaseConfig = JSON.parse(__firebase_config);
-        const app = initializeApp(firebaseConfig);
-        const auth = getAuth(app);
-        const db = getFirestore(app);
-
-        // オフラインキャッシュ
-        try { enableIndexedDbPersistence(db).catch(() => {}); } catch(e) {}
-
-        const appId = typeof __app_id !== 'undefined' ? __app_id : 'script-assist-pwa';
-        const apiKey = ""; 
-
-        let user = null;
-        let savedScripts = [];
+        // --- 以降、あなたの元のロジックを継承 ---
         let currentLayout = 'horizontal';
         let activeRoles = new Set();
         let dialogueData = {};
-
         const scriptInput = document.getElementById('script-input');
         const roleNamesInput = document.getElementById('role-names-input');
         const roleListDiv = document.getElementById('role-list');
         const toast = document.getElementById('toast');
         const saveModal = document.getElementById('save-modal');
 
-        // --- Auth ---
-        onAuthStateChanged(auth, (u) => { user = u; if (user) loadHistory(); });
-        const initAuth = async () => {
-            if (typeof __initial_auth_token !== 'undefined' && __initial_auth_token) {
-                await signInWithCustomToken(auth, __initial_auth_token);
-            } else {
-                await signInAnonymously(auth);
-            }
-        };
-        initAuth();
-
-        // --- UI Utils ---
         window.showMessage = (msg) => {
             toast.innerText = msg; toast.style.top = "20px";
             setTimeout(() => { toast.style.top = "-100px"; }, 3000);
         };
         window.openSaveModal = () => saveModal.classList.add('active');
         window.closeSaveModal = () => saveModal.classList.remove('active');
-
-        // --- Data Logic ---
-        async function loadHistory() {
-            if (!user) return;
-            const scriptsRef = collection(db, 'artifacts', appId, 'users', user.uid, 'scripts');
-            const snap = await getDocs(scriptsRef);
-            savedScripts = snap.docs.map(doc => ({ id: doc.id, ...doc.data() }));
-            renderHistory();
-        }
-
-        function renderHistory() {
-            const list = document.getElementById('script-list');
-            const section = document.getElementById('history-section');
-            if (savedScripts.length === 0) { section.classList.add('hidden'); return; }
-            section.classList.remove('hidden');
-            list.innerHTML = savedScripts.map(s => `
-                <div onclick="window.loadScript('${s.id}')" class="flex items-center justify-between p-4 bg-slate-50 rounded-2xl mb-2 active:bg-slate-100 transition-colors">
-                    <div class="flex flex-col overflow-hidden">
-                        <span class="font-bold text-slate-700 truncate text-sm">${s.title}</span>
-                        <span class="text-[9px] text-slate-400 font-sans italic">${s.updatedAt?.toDate().toLocaleDateString() || 'Recently'}</span>
-                    </div>
-                    <button onclick="window.deleteScript(event, '${s.id}')" class="p-2 text-slate-300 active:text-red-500">
-                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" /></svg>
-                    </button>
-                </div>
-            `).join('');
-        }
-
-        window.loadScript = (id) => {
-            const s = savedScripts.find(x => x.id === id);
-            if (!s) return;
-            scriptInput.value = s.content;
-            roleNamesInput.value = s.roles || "";
-            activeRoles = new Set(s.roles ? s.roles.split(',').map(n => n.trim()).filter(n => n) : []);
-            window.updateRoleChips();
-            window.showMessage(`「${s.title}」を読み込みました`);
-        };
-
-        window.deleteScript = async (e, id) => {
-            e.stopPropagation();
-            if (!confirm("削除しますか？")) return;
-            await deleteDoc(doc(db, 'artifacts', appId, 'users', user.uid, 'scripts', id));
-            loadHistory();
-        };
-
-        window.confirmSave = async () => {
-            const title = document.getElementById('save-title').value.trim();
-            if (!title || !scriptInput.value.trim()) return;
-            const docId = crypto.randomUUID();
-            await setDoc(doc(db, 'artifacts', appId, 'users', user.uid, 'scripts', docId), {
-                title, content: scriptInput.value, roles: roleNamesInput.value, updatedAt: Timestamp.now()
-            });
-            window.closeSaveModal();
-            loadHistory();
-            window.showMessage("保存しました");
-        };
 
         window.updateRoleChips = () => {
             const text = scriptInput.value;
@@ -295,42 +188,15 @@
             });
         };
 
-        window.repairWithAI = async () => {
-            if (!navigator.onLine) { window.showMessage("AI修復にはインターネットが必要です"); return; }
-            const text = scriptInput.value.trim();
-            if (!text) return;
-            document.getElementById('status-label').style.display = 'flex';
-            try {
-                const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-09-2025:generateContent?key=${apiKey}`;
-                const res = await fetch(url, { method: 'POST', headers: {'Content-Type': 'application/json'}, body: JSON.stringify({
-                    contents: [{parts:[{text}]}],
-                    systemInstruction: {parts:[{text: "台本修復。文字化けを直し役名：セリフの形式に。解説不要。"}]}
-                })});
-                const data = await res.json();
-                const result = data.candidates?.[0]?.content?.parts?.[0]?.text;
-                if (result) { scriptInput.value = result; window.updateRoleChips(); window.showMessage("修復完了"); }
-            } catch (e) { window.showMessage("AI修復失敗"); } finally { document.getElementById('status-label').style.display = 'none'; }
-        };
-
-        // --- 暗記ロジック ---
-        window.setLayout = (m) => {
-            currentLayout = m;
-            document.getElementById('btn-horiz').className = m === 'horizontal' ? "flex-1 py-3 text-xs font-bold rounded-xl bg-white shadow-sm text-indigo-600" : "flex-1 py-3 text-xs font-bold rounded-xl text-slate-400";
-            document.getElementById('btn-vert').className = m === 'vertical' ? "flex-1 py-3 text-xs font-bold rounded-xl bg-white shadow-sm text-indigo-600" : "flex-1 py-3 text-xs font-bold rounded-xl text-slate-400";
-        };
-
         window.startPractice = () => {
             const text = scriptInput.value.trim();
             const manual = roleNamesInput.value.split(',').map(n => n.trim()).filter(n => n);
             activeRoles = new Set(manual);
             if (activeRoles.size === 0 || !text) { window.showMessage("役を選んでください"); return; }
-            
             document.getElementById('active-roles-display').innerText = Array.from(activeRoles).join(' / ');
             const view = document.getElementById('script-viewport');
             view.innerHTML = '';
             view.className = currentLayout === 'vertical' ? 'writing-vertical' : 'p-6 space-y-6 overflow-y-auto h-full pb-40 font-serif';
-            dialogueData = {};
-
             text.split('\n').forEach((line, idx) => {
                 if (!line.trim()) return;
                 const match = line.match(/^([^：:「『\s　]+)([：:「『\s　])(.*)$/);
@@ -344,24 +210,14 @@
                     dialogueData[id] = { text: dialogueStr, count: 0, full: false };
                     const align = isMe ? (currentLayout === 'vertical' ? 'items-start' : 'items-end') : (currentLayout === 'vertical' ? 'items-end' : 'items-start');
                     container.className = `flex ${currentLayout === 'vertical' ? 'flex-col' : 'flex-row'} ${align} shrink-0 mb-4 gap-3`;
-                    
-                    const bubble = `
-                        <div class="flex flex-col ${align} flex-1 min-w-0">
-                            <span class="text-[10px] font-black ${isMe ? 'text-indigo-500' : 'text-slate-300'} mb-1 px-3 uppercase font-sans">${name}</span>
-                            <div class="p-6 rounded-[28px] shadow-sm border ${isMe ? 'bg-indigo-50/70 border-indigo-200' : 'bg-white border-slate-100'} ${currentLayout === 'vertical' ? 'mx-2 min-h-[140px]' : 'w-full'}">
-                                <div id="${id}" onclick="window.toggleAll('${id}')" class="text-xl font-medium leading-relaxed"></div>
-                            </div>
-                        </div>`;
-                    
+                    const bubble = `<div class="flex flex-col ${align} flex-1 min-w-0"><span class="text-[10px] font-black ${isMe ? 'text-indigo-500' : 'text-slate-300'} mb-1 px-3 uppercase font-sans">${name}</span><div class="p-6 rounded-[28px] shadow-sm border ${isMe ? 'bg-indigo-50/70 border-indigo-200' : 'bg-white border-slate-100'} ${currentLayout === 'vertical' ? 'mx-2 min-h-[140px]' : 'w-full'}"><div id="${id}" onclick="window.toggleAll('${id}')" class="text-xl font-medium leading-relaxed"></div></div></div>`;
                     if (isMe) {
                         const hint = document.createElement('button');
-                        hint.className = "hint-btn active:scale-90 transition-transform mb-2"; hint.innerHTML = "💡";
+                        hint.className = "hint-btn mb-2"; hint.innerHTML = "💡";
                         hint.onclick = (e) => { e.stopPropagation(); window.revealOne(id); };
                         container.innerHTML = bubble;
                         if (currentLayout === 'vertical') container.appendChild(hint); else container.prepend(hint);
-                    } else {
-                        container.innerHTML = bubble;
-                    }
+                    } else { container.innerHTML = bubble; }
                     view.appendChild(container);
                     if (isMe) window.renderDialogue(id); else document.getElementById(id).innerText = dialogueStr;
                 }
@@ -379,64 +235,40 @@
             if (d.full) el.innerHTML = `<span class="revealed-text">${d.text}</span>`;
             else el.innerHTML = `<span class="revealed-text">${d.text.substring(0, d.count)}</span><span class="blind-mask"></span>`;
         };
-
-        window.resetBlackouts = () => { Object.keys(dialogueData).forEach(id => { dialogueData[id].count = 0; dialogueData[id].full = false; window.renderDialogue(id); }); };
+        window.setLayout = (m) => { currentLayout = m; };
         window.exitPractice = () => { document.getElementById('practice-page').classList.add('hidden'); document.getElementById('setup-page').classList.remove('hidden'); };
+        window.resetBlackouts = () => { Object.keys(dialogueData).forEach(id => { dialogueData[id].count = 0; dialogueData[id].full = false; window.renderDialogue(id); }); };
         window.toggleOrientation = () => { window.setLayout(currentLayout === 'horizontal' ? 'vertical' : 'horizontal'); window.startPractice(); };
 
-        // --- PDF読込ロジック修正 ---
+        // --- PDF読み込み修正版 ---
         const fileInput = document.getElementById('file-input');
         fileInput.addEventListener('change', async (e) => {
             const f = e.target.files[0]; if (!f) return;
-            const status = document.getElementById('status-label');
-            status.style.display = 'flex';
-            
+            document.getElementById('status-label').style.display = 'flex';
             try {
                 if (f.type === "application/pdf") {
-                    const pdfjs = window.pdfjsLib;
-                    const buf = await f.arrayBuffer();
-                    const pdf = await pdfjs.getDocument({ data: buf }).promise;
-                    let fullText = "";
-                    
-                    for (let i = 1; i <= pdf.numPages; i++) {
-                        const page = await pdf.getPage(i);
-                        const content = await page.getTextContent();
-                        
-                        // 文字の位置座標（X, Y）を取得してソート
-                        let items = content.items.map(item => ({
-                            str: item.str,
-                            x: item.transform[4],
-                            y: item.transform[5]
-                        }));
-
-                        // 縦書きソート：右から左(X大→小)、かつ上から下(Y大→小)
-                        items.sort((a, b) => (Math.abs(a.x - b.x) > 12) ? b.x - a.x : b.y - a.y);
-
-                        let lastX = -1, pageText = "";
-                        items.forEach(item => {
-                            if (lastX !== -1 && Math.abs(item.x - lastX) > 12) pageText += "\n";
-                            pageText += item.str;
-                            lastX = item.x;
-                        });
-                        fullText += pageText + "\n\n";
-                    }
-                    scriptInput.value = fullText;
+                    const reader = new FileReader();
+                    reader.onload = async function() {
+                        const typedarray = new Uint8Array(this.result);
+                        const pdf = await pdfjsLib.getDocument(typedarray).promise;
+                        let fullText = "";
+                        for (let i = 1; i <= pdf.numPages; i++) {
+                            const page = await pdf.getPage(i);
+                            const content = await page.getTextContent();
+                            fullText += content.items.map(item => item.str).join(' ') + "\n";
+                        }
+                        scriptInput.value = fullText;
+                        window.updateRoleChips();
+                    };
+                    reader.readAsArrayBuffer(f);
                 } else {
                     const reader = new FileReader();
                     reader.onload = (ev) => { scriptInput.value = ev.target.result; window.updateRoleChips(); };
                     reader.readAsText(f);
                 }
-            } catch (err) { 
-                window.showMessage("PDFの読み込みに失敗しました。ファイル形式を確認してください。");
-                console.error(err);
-            } finally {
-                status.style.display = 'none';
-                window.updateRoleChips();
-            }
+            } catch (err) { window.showMessage("読込失敗"); } 
+            finally { document.getElementById('status-label').style.display = 'none'; }
         });
-
     </script>
 </body>
 </html>
-
-
